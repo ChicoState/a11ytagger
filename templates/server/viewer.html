@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}PDF Viewer - a11ytagger{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+    .viewer-wrapper {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 60px);
+        gap: 20px;
+        padding: 20px;
+    }
+    .viewer-container {
+        flex: 1;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        background: #f5f5f5;
+        padding: 20px;
+    }
+    .pdf-pages {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .pdf-page {
+        margin-bottom: 20px;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    canvas {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="viewer-wrapper">
+    <h1 style="margin: 0;">PDF Viewer</h1>
+    <div class="viewer-container">
+        <div id="pdf-pages" class="pdf-pages"></div>
+    </div>
+</div>
+
+<script>
+    const url = '{{ pdf_data_url }}';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    
+    pdfjsLib.getDocument(url).promise.then(pdf => {
+        const container = document.getElementById('pdf-pages');
+        const numPages = pdf.numPages;
+        
+        for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+            pdf.getPage(pageNum).then(page => {
+                const scale = 1.5;
+                const viewport = page.getViewport({ scale });
+                
+                const pageDiv = document.createElement('div');
+                pageDiv.className = 'pdf-page';
+                
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                
+                pageDiv.appendChild(canvas);
+                container.appendChild(pageDiv);
+                
+                page.render({
+                    canvasContext: context,
+                    viewport: viewport
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}
