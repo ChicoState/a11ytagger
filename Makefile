@@ -18,7 +18,7 @@ install:
 
 # Run Django development server
 run:
-	uv run python manage.py runserver
+	uv run python manage.py runserver 8080
 
 # Run Django migrations
 migrate:
@@ -40,7 +40,7 @@ docker-build:
 
 # Run Docker container
 docker-run:
-	docker run -p 8080:8080 a11ytagger
+	docker run -it -p 8080:8080 a11ytagger
 
 # Clean up cache files
 clean:
