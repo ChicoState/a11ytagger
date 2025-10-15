@@ -16,11 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from server.views import hello_world, PDFUploadView, PDFViewerView
+from server.views import hello_world, PDFUploadView, PDFViewerView, PDFAccessibilityUploadView, ExtractionResultsView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', hello_world, name='hello_world'),
     path('upload/', PDFUploadView.as_view(), name='pdf_upload'),
     path('viewer/<str:pdf_id>/', PDFViewerView.as_view(), name='pdf_viewer'),
+    path('accessibility/upload/', PDFAccessibilityUploadView.as_view(), name='pdf_accessibility_upload'),
+    path('accessibility/results/<str:cache_key>/', ExtractionResultsView.as_view(), name='extraction_results'),
 ]
