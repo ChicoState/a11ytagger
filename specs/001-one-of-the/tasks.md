@@ -34,12 +34,12 @@ Django single-app monolith - all code in `server/` app at repository root.
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 [P] Create dataclass models in `server/accessibility/models.py`: ImageReference, StructureElement, ExtractionResult, ValidationResult
-- [ ] T006 [P] Create PDF validation logic in `server/accessibility/validators.py`: validate_pdf_file(), ValidationStatus enum, encryption detection, file size warnings
-- [ ] T007 Create timeout context manager in `server/accessibility/extractor.py`: timeout() context manager using signal.alarm() for Unix/Linux/macOS
-- [ ] T008 Create core extraction scaffolding in `server/accessibility/extractor.py`: extract_accessibility_info() function signature, error handling structure
-- [ ] T009 [P] Add URL routes to `server/urls.py`: /accessibility/upload/, /accessibility/results/<cache_key>/
-- [ ] T010 Configure Django cache settings in `a11ytagger/settings.py` if not already configured: LocMemCache with 1-hour TTL
+- [x] T005 [P] Create dataclass models in `server/accessibility/models.py`: ImageReference, StructureElement, ExtractionResult, ValidationResult
+- [x] T006 [P] Create PDF validation logic in `server/accessibility/validators.py`: validate_pdf_file(), ValidationStatus enum, encryption detection, file size warnings
+- [x] T007 Create timeout context manager in `server/accessibility/extractor.py`: timeout() context manager using signal.alarm() for Unix/Linux/macOS
+- [x] T008 Create core extraction scaffolding in `server/accessibility/extractor.py`: extract_accessibility_info() function signature, error handling structure
+- [x] T009 [P] Add URL routes to `server/urls.py`: /accessibility/upload/, /accessibility/results/<cache_key>/
+- [x] T010 Configure Django cache settings in `a11ytagger/settings.py` if not already configured: LocMemCache with 1-hour TTL
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
