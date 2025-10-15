@@ -229,7 +229,7 @@ With multiple developers:
 - [P] tasks = different files, no dependencies - can run in parallel
 - [Story] label maps task to specific user story (US1, US2) for traceability
 - Each user story should be independently completable and testable
-- **COMMIT POLICY**: Make a git commit after EACH task completion (DO NOT PUSH - commits stay local)
+- Commit after each task or logical group
 - Stop at checkpoints to validate story independently
 - Foundational phase is CRITICAL - blocks all user stories
 - Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence
