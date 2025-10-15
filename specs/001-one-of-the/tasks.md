@@ -19,10 +19,10 @@ Django single-app monolith - all code in `server/` app at repository root.
 
 **Purpose**: Project initialization and basic structure needed by all user stories
 
-- [ ] T001 [P] Create accessibility package directory structure: `server/accessibility/__init__.py`
-- [ ] T002 [P] Create test directory structure: `tests/unit/`, `tests/integration/`, `tests/fixtures/sample_pdfs/`
-- [ ] T003 [P] Create templates directory: `templates/server/partials/`
-- [ ] T004 Verify pikepdf dependency in pyproject.toml (should already exist from project setup)
+- [x] T001 [P] Create accessibility package directory structure: `server/accessibility/__init__.py`
+- [x] T002 [P] Create test directory structure: `tests/unit/`, `tests/integration/`, `tests/fixtures/sample_pdfs/`
+- [x] T003 [P] Create templates directory: `templates/server/partials/`
+- [x] T004 Verify pikepdf dependency in pyproject.toml (should already exist from project setup)
 
 **Checkpoint**: Basic project structure in place
 
