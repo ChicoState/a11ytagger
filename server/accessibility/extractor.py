@@ -129,13 +129,15 @@ def timeout(seconds):
 
 
 def extract_accessibility_info(pdf_path, filename, timeout_seconds=10):
+    import os
+
     result = ExtractionResult(
         pdf_filename=filename,
         extraction_timestamp=datetime.now(),
         cache_key="",
         expires_at=datetime.now() + timedelta(hours=1),
         page_count=0,
-        file_size_bytes=0,
+        file_size_bytes=os.path.getsize(pdf_path),
         pdf_version="",
         success=False,
         has_structure_tree=False,
@@ -160,6 +162,17 @@ def extract_accessibility_info(pdf_path, filename, timeout_seconds=10):
 
             mark_info = pdf.Root.get('/MarkInfo')
             result.is_tagged = bool(mark_info and mark_info.get('/Marked'))
+
+            metadata = get_metadata(pdf)
+            result.document_language = metadata.get('language')
+            result.document_title = metadata.get('title')
+
+            if struct_tree_root:
+                try:
+                    result.structure_tree = extract_structure_tree(pdf, struct_tree_root)
+                    result.images = extract_images_from_tree(result.structure_tree)
+                except Exception as e:
+                    result.warnings.append(f"Partial extraction - corrupted tags: {str(e)}")
 
             result.success = True
             pdf.close()
