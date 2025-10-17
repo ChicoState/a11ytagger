@@ -33,7 +33,74 @@
     </div>
 
     <div class="simple-view">
-        <!-- Simple view content will be added in T026 -->
+        <div class="summary-section" style="background-color: #f9f9f9; border: 1px solid #ddd; padding: 1.5rem; margin: 1rem 0; border-radius: 4px;">
+            <h2>Summary</h2>
+            
+            <div class="summary-stats">
+                <div class="stat" style="margin: 0.5rem 0;">
+                    <strong>Total Images:</strong> {{ result.total_images }}
+                </div>
+                <div class="stat" style="margin: 0.5rem 0;">
+                    <strong>Images with Alt Text:</strong> {{ result.images_with_alt_text }} / {{ result.total_images }}
+                    {% if result.images_without_alt_text > 0 %}
+                    <span style="color: #c33; font-weight: bold;">({{ result.images_without_alt_text }} missing)</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="structure-section" style="background-color: #f9f9f9; border: 1px solid #ddd; padding: 1.5rem; margin: 1rem 0; border-radius: 4px;">
+            <h2>Document Structure</h2>
+            
+            <div class="structure-stats">
+                <div class="stat" style="margin: 0.5rem 0;">
+                    <strong>Has Structure Tags:</strong> 
+                    {% if result.has_structure_tree %}
+                    <span style="color: #393; font-weight: bold;">Yes</span>
+                    {% else %}
+                    <span style="color: #c33; font-weight: bold;">No</span>
+                    {% endif %}
+                </div>
+                <div class="stat" style="margin: 0.5rem 0;">
+                    <strong>Tagged PDF:</strong> 
+                    {% if result.is_tagged %}
+                    <span style="color: #393; font-weight: bold;">Yes</span>
+                    {% else %}
+                    <span style="color: #c33; font-weight: bold;">No</span>
+                    {% endif %}
+                </div>
+                {% if result.structure_types_found %}
+                <div class="stat" style="margin: 0.5rem 0;">
+                    <strong>Structure Types Found:</strong> {{ result.structure_types_found|join:", " }}
+                </div>
+                {% endif %}
+                {% if result.max_heading_level %}
+                <div class="stat" style="margin: 0.5rem 0;">
+                    <strong>Highest Heading Level:</strong> H{{ result.max_heading_level }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="metadata-section" style="background-color: #f9f9f9; border: 1px solid #ddd; padding: 1.5rem; margin: 1rem 0; border-radius: 4px;">
+            <h2>Document Metadata</h2>
+            
+            <div class="metadata-stats">
+                {% if result.document_title %}
+                <div class="stat" style="margin: 0.5rem 0;">
+                    <strong>Title:</strong> {{ result.document_title }}
+                </div>
+                {% endif %}
+                {% if result.document_language %}
+                <div class="stat" style="margin: 0.5rem 0;">
+                    <strong>Language:</strong> {{ result.document_language }}
+                </div>
+                {% endif %}
+                <div class="stat" style="margin: 0.5rem 0;">
+                    <strong>PDF Version:</strong> {{ result.pdf_version }}
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="detailed-view" style="display: none;">
