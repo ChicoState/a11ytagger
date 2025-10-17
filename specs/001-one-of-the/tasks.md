@@ -53,25 +53,25 @@ Django single-app monolith - all code in `server/` app at repository root.
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] Implement structure tree extraction in `server/accessibility/extractor.py`: extract_structure_tree() function to traverse /StructTreeRoot and /K children
-- [ ] T012 [US1] Implement structure element traversal in `server/accessibility/extractor.py`: traverse_element() recursive function to build StructureElement tree
-- [ ] T013 [US1] Implement image alt text extraction in `server/accessibility/extractor.py`: extract_images_from_tree() to find Figure elements with /Alt text
-- [ ] T014 [US1] Implement metadata extraction in `server/accessibility/extractor.py`: get_metadata() to extract /Lang and /Title from pdf.Root and pdf.docinfo
-- [ ] T015 [US1] Implement reading order indexing in `server/accessibility/extractor.py`: assign reading_order_index during pre-order traversal
-- [ ] T016 [US1] Complete extract_accessibility_info() in `server/accessibility/extractor.py`: integrate all extraction functions, handle timeouts, populate ExtractionResult
-- [ ] T017 [US1] Create PDFAccessibilityUploadView in `server/views.py`: CBV with get() and post() methods
-- [ ] T018 [US1] Implement file upload handling in PDFAccessibilityUploadView.post(): save temp file, call validator, handle validation errors
-- [ ] T019 [US1] Implement extraction trigger in PDFAccessibilityUploadView.post(): call extract_accessibility_info() with timeout, cache result, redirect to results
-- [ ] T020 [US1] Create cache key generation logic in PDFAccessibilityUploadView.post(): hash-based cache key with format "pdf_extraction:{hash}:{timestamp}"
-- [ ] T021 [US1] Create ExtractionResultsView in `server/views.py`: CBV with get() method to retrieve from cache
-- [ ] T022 [US1] Implement cache retrieval in ExtractionResultsView.get(): cache.get(cache_key), handle cache miss with 404
-- [ ] T023 [P] [US1] Create upload form template in `templates/server/accessibility_upload.html`: file upload form with CSRF, error display area
-- [ ] T024 [P] [US1] Create results template in `templates/server/extraction_results.html`: basic structure with simple view container
-- [ ] T025 [P] [US1] Create error template in `templates/server/extraction_error.html`: error message display with retry link
-- [ ] T026 [US1] Implement simple summary view in `templates/server/extraction_results.html`: display total_images, images_with_alt_text, has_structure_tree, is_tagged, structure_types_found
-- [ ] T027 [US1] Add encrypted PDF rejection in PDFAccessibilityUploadView.post(): render error template when validation.is_encrypted
-- [ ] T028 [US1] Add timeout error handling in PDFAccessibilityUploadView.post(): render error template when result.timed_out
-- [ ] T029 [US1] Add invalid PDF error handling in PDFAccessibilityUploadView.post(): render error template when validation.is_valid_pdf is False
+- [x] T011 [US1] Implement structure tree extraction in `server/accessibility/extractor.py`: extract_structure_tree() function to traverse /StructTreeRoot and /K children
+- [x] T012 [US1] Implement structure element traversal in `server/accessibility/extractor.py`: traverse_element() recursive function to build StructureElement tree
+- [x] T013 [US1] Implement image alt text extraction in `server/accessibility/extractor.py`: extract_images_from_tree() to find Figure elements with /Alt text
+- [x] T014 [US1] Implement metadata extraction in `server/accessibility/extractor.py`: get_metadata() to extract /Lang and /Title from pdf.Root and pdf.docinfo
+- [x] T015 [US1] Implement reading order indexing in `server/accessibility/extractor.py`: assign reading_order_index during pre-order traversal
+- [x] T016 [US1] Complete extract_accessibility_info() in `server/accessibility/extractor.py`: integrate all extraction functions, handle timeouts, populate ExtractionResult
+- [x] T017 [US1] Create PDFAccessibilityUploadView in `server/views.py`: CBV with get() and post() methods
+- [x] T018 [US1] Implement file upload handling in PDFAccessibilityUploadView.post(): save temp file, call validator, handle validation errors
+- [x] T019 [US1] Implement extraction trigger in PDFAccessibilityUploadView.post(): call extract_accessibility_info() with timeout, cache result, redirect to results
+- [x] T020 [US1] Create cache key generation logic in PDFAccessibilityUploadView.post(): hash-based cache key with format "pdf_extraction:{hash}:{timestamp}"
+- [x] T021 [US1] Create ExtractionResultsView in `server/views.py`: CBV with get() method to retrieve from cache
+- [x] T022 [US1] Implement cache retrieval in ExtractionResultsView.get(): cache.get(cache_key), handle cache miss with 404
+- [x] T023 [P] [US1] Create upload form template in `templates/server/accessibility_upload.html`: file upload form with CSRF, error display area
+- [x] T024 [P] [US1] Create results template in `templates/server/extraction_results.html`: basic structure with simple view container
+- [x] T025 [P] [US1] Create error template in `templates/server/extraction_error.html`: error message display with retry link
+- [x] T026 [US1] Implement simple summary view in `templates/server/extraction_results.html`: display total_images, images_with_alt_text, has_structure_tree, is_tagged, structure_types_found
+- [x] T027 [US1] Add encrypted PDF rejection in PDFAccessibilityUploadView.post(): render error template when validation.is_encrypted
+- [x] T028 [US1] Add timeout error handling in PDFAccessibilityUploadView.post(): render error template when result.timed_out
+- [x] T029 [US1] Add invalid PDF error handling in PDFAccessibilityUploadView.post(): render error template when validation.is_valid_pdf is False
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - users can upload PDFs and see basic accessibility status in simple view
 
