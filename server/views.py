@@ -61,6 +61,23 @@ class PDFAccessibilityUploadView(View):
                 f.write(chunk)
 
         validation = validate_pdf_file(temp_path)
+        
+        if validation.is_encrypted:
+            os.remove(temp_path)
+            return render(request, "server/accessibility_upload.html", {
+                "error_type": "encrypted",
+                "error_message": validation.errors[0] if validation.errors else "PDF is encrypted",
+                "warnings": validation.warnings
+            })
+        
+        if not validation.is_valid_pdf:
+            os.remove(temp_path)
+            return render(request, "server/accessibility_upload.html", {
+                "error_type": "invalid_pdf",
+                "error_message": validation.errors[0] if validation.errors else "Invalid PDF",
+                "warnings": validation.warnings
+            })
+        
         if not validation.can_proceed:
             os.remove(temp_path)
             return render(request, "server/accessibility_upload.html", {
@@ -81,13 +98,6 @@ class PDFAccessibilityUploadView(View):
             return render(request, "server/accessibility_upload.html", {
                 "error_type": "timeout",
                 "error_message": "PDF is too complex for processing. Please try a smaller document.",
-                "warnings": validation.warnings
-            })
-
-        if not result.is_valid_pdf:
-            return render(request, "server/accessibility_upload.html", {
-                "error_type": "invalid_pdf",
-                "error_message": result.errors[0] if result.errors else "Invalid PDF",
                 "warnings": validation.warnings
             })
 
