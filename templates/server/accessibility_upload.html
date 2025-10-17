@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>PDF Accessibility Analysis</h1>
+    <p>Upload a PDF to analyze its accessibility features (alt text, structure tags, reading order).</p>
+
+    {% if error_message %}
+    <div class="error-message" style="background-color: #fee; border: 1px solid #c33; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+        <strong>Error:</strong> {{ error_message }}
+    </div>
+    {% endif %}
+
+    {% if warnings %}
+    <div class="warning-message" style="background-color: #ffc; border: 1px solid #cc6; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+        <strong>Warning:</strong>
+        <ul>
+            {% for warning in warnings %}
+            <li>{{ warning }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" style="margin: 2rem 0;">
+        {% csrf_token %}
+        <div style="margin: 1rem 0;">
+            <label for="pdf_file">Select PDF file:</label>
+            <input type="file" name="pdf_file" id="pdf_file" accept="application/pdf" required>
+        </div>
+        <button type="submit" style="padding: 0.5rem 2rem; font-size: 1rem;">Analyze PDF</button>
+    </form>
+
+    <div class="info" style="background-color: #eef; border: 1px solid #99c; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+        <h3>What this tool does:</h3>
+        <ul>
+            <li>Extracts existing alt text from images</li>
+            <li>Identifies document structure tags (headings, paragraphs, lists, tables)</li>
+            <li>Shows reading order of content elements</li>
+            <li>Displays document metadata (title, language)</li>
+        </ul>
+        <p><strong>Note:</strong> This tool does not modify your PDF. It only reads and displays accessibility information.</p>
+    </div>
+</div>
+{% endblock %}

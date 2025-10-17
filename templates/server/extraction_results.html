@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Accessibility Analysis Results</h1>
+    <p class="filename"><strong>File:</strong> {{ result.pdf_filename }} ({{ result.page_count }} pages, {{ result.file_size_bytes|filesizeformat }})</p>
+
+    {% if result.errors %}
+    <div class="error-message" style="background-color: #fee; border: 1px solid #c33; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+        <strong>Errors:</strong>
+        <ul>
+            {% for error in result.errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if result.warnings %}
+    <div class="warning-message" style="background-color: #ffc; border: 1px solid #cc6; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+        <strong>Warnings:</strong>
+        <ul>
+            {% for warning in result.warnings %}
+            <li>{{ warning }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="view-toggle" style="margin: 2rem 0;">
+        <button data-view="simple" class="active" style="padding: 0.5rem 1rem; margin-right: 0.5rem;">Simple View</button>
+        <button data-view="detailed" style="padding: 0.5rem 1rem;">Detailed View</button>
+    </div>
+
+    <div class="simple-view">
+        <!-- Simple view content will be added in T026 -->
+    </div>
+
+    <div class="detailed-view" style="display: none;">
+        <!-- Detailed view content will be added in User Story 2 -->
+    </div>
+
+    <div style="margin: 2rem 0;">
+        <a href="{% url 'pdf_accessibility_upload' %}" style="padding: 0.5rem 1rem; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px;">Analyze Another PDF</a>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.view-toggle button').forEach(button => {
+    button.addEventListener('click', function() {
+        document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        const view = this.dataset.view;
+        document.querySelector('.simple-view').style.display = view === 'simple' ? 'block' : 'none';
+        document.querySelector('.detailed-view').style.display = view === 'detailed' ? 'block' : 'none';
+    });
+});
+</script>
+{% endblock %}
