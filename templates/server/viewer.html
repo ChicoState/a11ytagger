@@ -38,10 +38,112 @@
 
 {% block content %}
 <div class="viewer-wrapper">
-    <h1 style="margin: 0;">PDF Viewer</h1>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h1 style="margin: 0;">PDF Viewer</h1>
+        {% if extraction_result %}
+        <a href="#accessibility-analysis" style="padding: 0.5rem 1rem; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px;">View Accessibility Analysis</a>
+        {% endif %}
+    </div>
     <div class="viewer-container">
         <div id="pdf-pages" class="pdf-pages"></div>
     </div>
+    
+    {% if extraction_result %}
+    <div id="accessibility-analysis" style="margin-top: 2rem; padding: 2rem; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 4px;">
+        <h2>Accessibility Analysis</h2>
+        
+        {% if extraction_result.errors %}
+        <div class="error-message" style="background-color: #fee; border: 1px solid #c33; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+            <strong>Errors:</strong>
+            <ul>
+                {% for error in extraction_result.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if extraction_result.warnings %}
+        <div class="warning-message" style="background-color: #ffc; border: 1px solid #cc6; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+            <strong>Warnings:</strong>
+            <ul>
+                {% for warning in extraction_result.warnings %}
+                <li>{{ warning }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        
+        <div class="summary-section" style="background-color: white; border: 1px solid #ddd; padding: 1.5rem; margin: 1rem 0; border-radius: 4px;">
+            <h3>Summary</h3>
+            
+            <div class="summary-stats">
+                <div class="stat" style="margin: 0.5rem 0;">
+                    <strong>Total Images:</strong> {{ extraction_result.total_images }}
+                </div>
+                <div class="stat" style="margin: 0.5rem 0;">
+                    <strong>Images with Alt Text:</strong> {{ extraction_result.images_with_alt_text }} / {{ extraction_result.total_images }}
+                    {% if extraction_result.images_without_alt_text > 0 %}
+                    <span style="color: #c33; font-weight: bold;">({{ extraction_result.images_without_alt_text }} missing)</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="structure-section" style="background-color: white; border: 1px solid #ddd; padding: 1.5rem; margin: 1rem 0; border-radius: 4px;">
+            <h3>Document Structure</h3>
+            
+            <div class="structure-stats">
+                <div class="stat" style="margin: 0.5rem 0;">
+                    <strong>Has Structure Tags:</strong> 
+                    {% if extraction_result.has_structure_tree %}
+                    <span style="color: #393; font-weight: bold;">Yes</span>
+                    {% else %}
+                    <span style="color: #c33; font-weight: bold;">No</span>
+                    {% endif %}
+                </div>
+                <div class="stat" style="margin: 0.5rem 0;">
+                    <strong>Tagged PDF:</strong> 
+                    {% if extraction_result.is_tagged %}
+                    <span style="color: #393; font-weight: bold;">Yes</span>
+                    {% else %}
+                    <span style="color: #c33; font-weight: bold;">No</span>
+                    {% endif %}
+                </div>
+                {% if extraction_result.structure_types_found %}
+                <div class="stat" style="margin: 0.5rem 0;">
+                    <strong>Structure Types Found:</strong> {{ extraction_result.structure_types_found|join:", " }}
+                </div>
+                {% endif %}
+                {% if extraction_result.max_heading_level %}
+                <div class="stat" style="margin: 0.5rem 0;">
+                    <strong>Highest Heading Level:</strong> H{{ extraction_result.max_heading_level }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="metadata-section" style="background-color: white; border: 1px solid #ddd; padding: 1.5rem; margin: 1rem 0; border-radius: 4px;">
+            <h3>Document Metadata</h3>
+            
+            <div class="metadata-stats">
+                {% if extraction_result.document_title %}
+                <div class="stat" style="margin: 0.5rem 0;">
+                    <strong>Title:</strong> {{ extraction_result.document_title }}
+                </div>
+                {% endif %}
+                {% if extraction_result.document_language %}
+                <div class="stat" style="margin: 0.5rem 0;">
+                    <strong>Language:</strong> {{ extraction_result.document_language }}
+                </div>
+                {% endif %}
+                <div class="stat" style="margin: 0.5rem 0;">
+                    <strong>PDF Version:</strong> {{ extraction_result.pdf_version }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 
 <script>
