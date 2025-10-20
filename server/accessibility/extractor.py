@@ -1,13 +1,10 @@
+import os
 from datetime import datetime, timedelta
 
 import pikepdf
 from pikepdf import PdfError, PasswordError
 
 from .models import ExtractionResult, ImageReference, StructureElement
-
-
-class ExtractionTimeout(Exception):
-    pass
 
 
 def extract_structure_tree(pdf, struct_tree_root):
@@ -113,9 +110,7 @@ def get_metadata(pdf):
     return metadata
 
 
-def extract_accessibility_info(pdf_path, filename, timeout_seconds=10):
-    import os
-
+def extract_accessibility_info(pdf_path, filename):
     result = ExtractionResult(
         pdf_filename=filename,
         extraction_timestamp=datetime.now(),
