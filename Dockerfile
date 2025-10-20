@@ -1,4 +1,4 @@
-FROM ghcr.io/astral-sh/uv:debian-slim
+FROM ghcr.io/astral-sh/uv:alpine
 
 COPY pyproject.toml uv.lock /opt/a11ytagger/
 
