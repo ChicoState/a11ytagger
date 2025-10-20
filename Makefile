@@ -1,4 +1,4 @@
-.PHONY: help install sync run migrate makemigrations shell build docker-build docker-run clean
+.PHONY: help install sync run migrate makemigrations shell build docker-build docker-run clean collectstatic
 
 # Default target - show help
 help:
@@ -18,24 +18,28 @@ install:
 
 # Run Django development server
 run:
-	uv run python manage.py runserver 8080
+	uv run manage.py runserver 8080
 
 # Run Django migrations
 migrate:
-	uv run python manage.py migrate
+	uv run manage.py migrate
+
+# Run Django collectstatic
+collectstatic:
+	uv run manage.py collectstatic --noinput
 
 # Create new migrations
 makemigrations:
-	uv run python manage.py makemigrations
+	uv run manage.py makemigrations
 
 # Open Django shell
 shell:
-	uv run python manage.py shell
+	uv run manage.py shell
 
 # Build Docker image
 build: docker-build
 
-docker-build:
+docker-build: install collectstatic
 	docker build -t a11ytagger .
 
 # Run Docker container
