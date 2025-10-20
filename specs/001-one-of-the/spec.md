@@ -63,13 +63,13 @@ Users need guidance on what accessibility information is absent from their PDF s
 - **FR-006**: System MUST validate PDF file structure before processing and report validity errors to users
 - **FR-007**: System MUST handle PDFs that fail to parse gracefully, providing clear error messages to users
 - **FR-008**: System MUST emit warnings to users when processing unusually large PDFs (no hard size limit imposed)
-- **FR-009**: System MUST display the extraction results on a dedicated page after PDF upload
+- **FR-009**: System MUST display the extraction results in the PDF viewer page alongside the PDF
 - **FR-010**: Users MUST be able to view accessibility information for the uploaded PDF without modifying the original file
 - **FR-011**: System MUST identify language metadata and document title from accessibility information
 - **FR-012**: System MUST retain uploaded PDFs and extraction results for 1 hour in-memory cache with automatic cleanup
 - **FR-013**: System architecture MUST support future migration to session-based retention without requiring major refactoring
 - **FR-014**: System MUST detect encrypted PDFs during validation and reject them with a clear error message instructing users to decrypt the file before uploading
-- **FR-015**: System MUST abort extraction operations that exceed 10 seconds and present an error message to users
+- **FR-015**: System architecture MUST support future timeout handling for complex PDFs (deferred in MVP due to WSGI/ASGI threading constraints)
 - **FR-016**: System architecture MUST support future migration to asynchronous background processing with progress indicators
 - **FR-017**: System MUST provide a toggle mechanism allowing users to switch between simplified summary and detailed technical views of extraction results
 
@@ -80,7 +80,7 @@ Users need guidance on what accessibility information is absent from their PDF s
 - Performance target assumes PDFs of typical business document size (1-50 pages, under 10MB)
 - Extraction library will be designed as a separate component that can be tested independently of the Django views
 - MVP uses in-memory cache for 1-hour retention; architecture must accommodate future migration to session-based persistence with disk storage for large files
-- MVP uses synchronous extraction with 10-second timeout; architecture must accommodate future migration to asynchronous background processing
+- MVP uses synchronous extraction without timeout (timeout deferred due to WSGI/ASGI threading constraints); architecture must accommodate future migration to asynchronous background processing with timeout support
 
 ### Key Entities *(include if feature involves data)*
 
