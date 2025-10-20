@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.core.cache import cache
 
+from server.accessibility.validators import validate_pdf_file
 from server.accessibility.extractor import extract_accessibility_info
 
 
@@ -29,6 +30,14 @@ class PDFUploadView(View):
         temp_path = f"/tmp/{pdf_file.name}_{pdf_id}"
         with open(temp_path, "wb") as f:
             f.write(pdf_data)
+
+        validation = validate_pdf_file(temp_path)
+        if not validation.can_proceed:
+            os.remove(temp_path)
+            return render(request, "server/upload.html", {
+                "error": validation.errors[0] if validation.errors else "Invalid PDF",
+                "warnings": validation.warnings
+            })
 
         result = extract_accessibility_info(temp_path, pdf_file.name)
         os.remove(temp_path)
