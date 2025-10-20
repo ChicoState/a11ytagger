@@ -39,8 +39,8 @@ docker-build:
 	docker build -t a11ytagger .
 
 # Run Docker container
-docker-run:
-	docker run -it -p 8080:8080 a11ytagger
+docker-run: docker-build
+	docker run --rm -it -p 8080:8080 a11ytagger
 
 # Clean up cache files
 clean:

@@ -5,22 +5,32 @@
 {% block extra_head %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
-    .viewer-wrapper {
+    body {
+        margin: 0;
+        overflow: hidden;
+    }
+    .split-view {
         display: flex;
-        flex-direction: column;
-        height: calc(100vh - 60px);
-        gap: 20px;
+        height: 100vh;
+        width: 100vw;
+    }
+    .left-toolbar {
+        width: 350px;
+        height: 100vh;
+        overflow-y: auto;
+        background: #f9f9f9;
+        border-right: 1px solid #ddd;
         padding: 20px;
     }
-    .viewer-container {
+    .right-viewer {
         flex: 1;
+        height: 100vh;
         overflow-y: auto;
-        border: 1px solid #ddd;
         background: #f5f5f5;
         padding: 20px;
     }
     .pdf-pages {
-        max-width: 1200px;
+        max-width: 900px;
         margin: 0 auto;
     }
     .pdf-page {
@@ -33,13 +43,124 @@
         width: 100%;
         height: auto;
     }
+    .summary-section, .structure-section, .metadata-section {
+        background-color: white;
+        border: 1px solid #ddd;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-radius: 4px;
+    }
+    .stat {
+        margin: 0.5rem 0;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    h2 {
+        margin-top: 0;
+        font-size: 1.25rem;
+    }
+    h3 {
+        margin-top: 0;
+        font-size: 1.1rem;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="viewer-wrapper">
-    <h1 style="margin: 0;">PDF Viewer</h1>
-    <div class="viewer-container">
+<div class="split-view">
+    <div class="left-toolbar">
+        <h2>Accessibility Analysis</h2>
+        
+        {% if extraction_result %}
+        
+        {% if extraction_result.errors %}
+        <div class="error-message" style="background-color: #fee; border: 1px solid #c33; padding: 0.75rem; margin: 1rem 0; border-radius: 4px; font-size: 0.9rem;">
+            <strong>Errors:</strong>
+            <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+                {% for error in extraction_result.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if extraction_result.warnings %}
+        <div class="warning-message" style="background-color: #ffc; border: 1px solid #cc6; padding: 0.75rem; margin: 1rem 0; border-radius: 4px; font-size: 0.9rem;">
+            <strong>Warnings:</strong>
+            <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+                {% for warning in extraction_result.warnings %}
+                <li>{{ warning }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        
+        <div class="summary-section">
+            <h3>Summary</h3>
+            <div class="stat">
+                <strong>Total Images:</strong> {{ extraction_result.total_images }}
+            </div>
+            <div class="stat">
+                <strong>Images with Alt Text:</strong> {{ extraction_result.images_with_alt_text }} / {{ extraction_result.total_images }}
+                {% if extraction_result.images_without_alt_text > 0 %}
+                <span style="color: #c33; font-weight: bold;">({{ extraction_result.images_without_alt_text }} missing)</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="structure-section">
+            <h3>Document Structure</h3>
+            <div class="stat">
+                <strong>Has Structure Tags:</strong> 
+                {% if extraction_result.has_structure_tree %}
+                <span style="color: #393; font-weight: bold;">Yes</span>
+                {% else %}
+                <span style="color: #c33; font-weight: bold;">No</span>
+                {% endif %}
+            </div>
+            <div class="stat">
+                <strong>Tagged PDF:</strong> 
+                {% if extraction_result.is_tagged %}
+                <span style="color: #393; font-weight: bold;">Yes</span>
+                {% else %}
+                <span style="color: #c33; font-weight: bold;">No</span>
+                {% endif %}
+            </div>
+            {% if extraction_result.structure_types_found %}
+            <div class="stat">
+                <strong>Structure Types:</strong> {{ extraction_result.structure_types_found|join:", " }}
+            </div>
+            {% endif %}
+            {% if extraction_result.max_heading_level %}
+            <div class="stat">
+                <strong>Highest Heading:</strong> H{{ extraction_result.max_heading_level }}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="metadata-section">
+            <h3>Metadata</h3>
+            {% if extraction_result.document_title %}
+            <div class="stat">
+                <strong>Title:</strong> {{ extraction_result.document_title }}
+            </div>
+            {% endif %}
+            {% if extraction_result.document_language %}
+            <div class="stat">
+                <strong>Language:</strong> {{ extraction_result.document_language }}
+            </div>
+            {% endif %}
+            <div class="stat">
+                <strong>PDF Version:</strong> {{ extraction_result.pdf_version }}
+            </div>
+        </div>
+        
+        {% else %}
+        <p style="color: #666; font-style: italic;">No accessibility analysis available.</p>
+        {% endif %}
+    </div>
+    
+    <div class="right-viewer">
         <div id="pdf-pages" class="pdf-pages"></div>
     </div>
 </div>
