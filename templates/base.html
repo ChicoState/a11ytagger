@@ -1,13 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}a11ytagger{% endblock %}</title>
     {% block extra_head %}{% endblock %}
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .top-band {
+            background-color: #ccc;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #999;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 20px;
+            padding-left: 0px;
+        }
+
+        .nav-buttons a {
+            background-color: black;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-buttons a:hover {
+            background-color: #333;
+        }
+
+        .nav-buttons a:focus {
+            outline: 2px solid #fff;
+            outline-offset: 2px;
+        }
+
+        .nav-buttons a.active {
+            background-color: #555;
+        }
+
+        .settings-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            background-color: white;
+            color: black;
+            border: none;
+            border-radius: 4px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .settings-btn:hover {
+            background-color: #e6e6e6;
+            transform: scale(1.05);
+        }
+
+        .settings-btn:focus {
+            outline: 2px solid #000;
+            outline-offset: 2px;
+        }
+
+        .settings-btn svg {
+            width: 25px;
+            height: 25px;
+            fill: black;
+        }
+    </style>
 </head>
+
 <body>
     {% include "navbar.html" %}
     {% block content %}{% endblock %}
 </body>
+
 </html>

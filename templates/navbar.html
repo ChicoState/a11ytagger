@@ -1,6 +1,14 @@
-<nav>
-    <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/upload/">Upload PDF</a></li>
-    </ul>
+<nav class="top-band">
+    <div class="nav-buttons">
+        <a href="/" class="{% if request.path == '/' %}active{% endif %}">Home</a>
+        <a href="/upload/" class="{% if request.path == '/upload/' %}active{% endif %}">Upload PDF</a>
+        <a href="/faq/" class="{% if request.path == '/faq/' %}active{% endif %}">FAQ</a>
+        <a href="https://github.com/ChicoState/a11ytagger" target="_blank">Github</a>
+        <a href="/about/" class="{% if request.path == '/about/' %}active{% endif %}">About</a>
+    </div>
+
+    <button class="settings-btn" title="Settings" aria-label="Settings">
+        {% load static %}
+        <img src="{% static 'a11ytagger/icon-gear.svg' %}" width="25" height="25" alt="My image">
+    </button>
 </nav>
