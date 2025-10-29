@@ -7,19 +7,29 @@
     <title>{% block title %}a11ytagger{% endblock %}</title>
     {% block extra_head %}{% endblock %}
     <style>
+        :root {
+            --bg-color: #f2eae3;
+            --navbar-color: #4C5454;
+            --btn-color: #BACCB8;
+            --btn-hover-color: #8CA989;
+            --btn-focus-color: #ffffff;
+            --btn-selected-color: #6C8E67;
+            --text-color: oklab(0% 0 0);
+        }
+
         html,
         body {
             margin: 0;
             padding: 0;
+            background-color: var(--bg-color);
         }
 
         .top-band {
-            background-color: #ccc;
+            background-color: var(--navbar-color);
             padding: 10px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid #999;
         }
 
         .nav-buttons {
@@ -29,8 +39,8 @@
         }
 
         .nav-buttons a {
-            background-color: black;
-            color: white;
+            background-color: var(--btn-color);
+            color: var(--text-color);
             text-decoration: none;
             padding: 10px 20px;
             border-radius: 4px;
@@ -40,16 +50,16 @@
         }
 
         .nav-buttons a:hover {
-            background-color: #333;
+            background-color: var(--btn-hover-color);
         }
 
         .nav-buttons a:focus {
-            outline: 2px solid #fff;
+            outline: 2px solid var(--btn-focus-color);
             outline-offset: 2px;
         }
 
         .nav-buttons a.active {
-            background-color: #555;
+            background-color: var(--btn-selected-color);
         }
 
         .settings-btn {
@@ -57,8 +67,7 @@
             align-items: center;
             justify-content: center;
             padding: 10px;
-            background-color: white;
-            color: black;
+            background-color: var(--btn-color);
             border: none;
             border-radius: 4px;
             width: 40px;
@@ -68,19 +77,17 @@
         }
 
         .settings-btn:hover {
-            background-color: #e6e6e6;
-            transform: scale(1.05);
+            background-color: var(--btn-hover-color);
         }
 
         .settings-btn:focus {
-            outline: 2px solid #000;
+            outline: 2px solid var(--btn-focus-color);
             outline-offset: 2px;
         }
 
-        .settings-btn svg {
+        .settings-btn img {
             width: 25px;
             height: 25px;
-            fill: black;
         }
     </style>
 </head>
