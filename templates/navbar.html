@@ -1,5 +1,13 @@
 <nav class="top-band">
     <div class="nav-buttons">
+        <button id="sidebar-toggle" class="sidebar-toggle-btn" title="Toggle Sidebar" aria-label="Toggle Sidebar" aria-expanded="true" aria-controls="sidebar">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="3" width="7" height="18" stroke="currentColor" stroke-width="2" fill="none"/>
+                <line x1="14" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="2"/>
+                <line x1="14" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="2"/>
+                <line x1="14" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="2"/>
+            </svg>
+        </button>
         <a href="/" class="{% if request.path == '/' %}active{% endif %}">Home</a>
         <a href="/upload/" class="{% if request.path == '/upload/' %}active{% endif %}">Upload PDF</a>
         <a href="/faq/" class="{% if request.path == '/faq/' %}active{% endif %}">FAQ</a>

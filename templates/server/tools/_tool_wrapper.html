@@ -1,0 +1,11 @@
+<div class="tool-foldout" data-tool-id="{{ tool_id }}">
+    <div class="tool-header" role="button" tabindex="0" aria-expanded="false" aria-controls="tool-content-{{ tool_id }}" aria-labelledby="tool-title-{{ tool_id }}">
+        <span id="tool-title-{{ tool_id }}" class="tool-title">{{ tool_title }}</span>
+        <svg class="tool-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+    <div id="tool-content-{{ tool_id }}" class="tool-content">
+        {% include tool_content_template %}
+    </div>
+</div>
