@@ -14,13 +14,20 @@
         height: 100vh;
         width: 100vw;
     }
-    .left-toolbar {
+    .sidebar {
         width: 350px;
         height: 100vh;
         overflow-y: auto;
         background: #f9f9f9;
         border-right: 1px solid #ddd;
         padding: 20px;
+        transition: width 0.3s ease, padding 0.3s ease;
+    }
+    
+    .sidebar.collapsed {
+        width: 40px;
+        padding: 10px 5px;
+        overflow: hidden;
     }
     .right-viewer {
         flex: 1;
@@ -63,101 +70,54 @@
         margin-top: 0;
         font-size: 1.1rem;
     }
+    .tool-foldout {
+        margin-bottom: 0.5rem;
+    }
+    .tool-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        background: #e6e6e6;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        user-select: none;
+    }
+    .tool-header:hover {
+        background: #d9d9d9;
+    }
+    .tool-header:focus {
+        outline: 2px solid #666;
+        outline-offset: 2px;
+    }
+    .tool-title {
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    .tool-chevron {
+        transition: transform 0.3s ease;
+        flex-shrink: 0;
+    }
+    .tool-chevron.rotated {
+        transform: rotate(90deg);
+    }
+    .tool-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+    .tool-content.expanded {
+        max-height: 10000px;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="split-view">
-    <div class="left-toolbar">
-        <h2>Accessibility Analysis</h2>
-        
-        {% if extraction_result %}
-        
-        {% if extraction_result.errors %}
-        <div class="error-message" style="background-color: #fee; border: 1px solid #c33; padding: 0.75rem; margin: 1rem 0; border-radius: 4px; font-size: 0.9rem;">
-            <strong>Errors:</strong>
-            <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
-                {% for error in extraction_result.errors %}
-                <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
-
-        {% if extraction_result.warnings %}
-        <div class="warning-message" style="background-color: #ffc; border: 1px solid #cc6; padding: 0.75rem; margin: 1rem 0; border-radius: 4px; font-size: 0.9rem;">
-            <strong>Warnings:</strong>
-            <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
-                {% for warning in extraction_result.warnings %}
-                <li>{{ warning }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
-        
-        <div class="summary-section">
-            <h3>Summary</h3>
-            <div class="stat">
-                <strong>Total Images:</strong> {{ extraction_result.total_images }}
-            </div>
-            <div class="stat">
-                <strong>Images with Alt Text:</strong> {{ extraction_result.images_with_alt_text }} / {{ extraction_result.total_images }}
-                {% if extraction_result.images_without_alt_text > 0 %}
-                <span style="color: #c33; font-weight: bold;">({{ extraction_result.images_without_alt_text }} missing)</span>
-                {% endif %}
-            </div>
-        </div>
-
-        <div class="structure-section">
-            <h3>Document Structure</h3>
-            <div class="stat">
-                <strong>Has Structure Tags:</strong> 
-                {% if extraction_result.has_structure_tree %}
-                <span style="color: #393; font-weight: bold;">Yes</span>
-                {% else %}
-                <span style="color: #c33; font-weight: bold;">No</span>
-                {% endif %}
-            </div>
-            <div class="stat">
-                <strong>Tagged PDF:</strong> 
-                {% if extraction_result.is_tagged %}
-                <span style="color: #393; font-weight: bold;">Yes</span>
-                {% else %}
-                <span style="color: #c33; font-weight: bold;">No</span>
-                {% endif %}
-            </div>
-            {% if extraction_result.structure_types_found %}
-            <div class="stat">
-                <strong>Structure Types:</strong> {{ extraction_result.structure_types_found|join:", " }}
-            </div>
-            {% endif %}
-            {% if extraction_result.max_heading_level %}
-            <div class="stat">
-                <strong>Highest Heading:</strong> H{{ extraction_result.max_heading_level }}
-            </div>
-            {% endif %}
-        </div>
-
-        <div class="metadata-section">
-            <h3>Metadata</h3>
-            {% if extraction_result.document_title %}
-            <div class="stat">
-                <strong>Title:</strong> {{ extraction_result.document_title }}
-            </div>
-            {% endif %}
-            {% if extraction_result.document_language %}
-            <div class="stat">
-                <strong>Language:</strong> {{ extraction_result.document_language }}
-            </div>
-            {% endif %}
-            <div class="stat">
-                <strong>PDF Version:</strong> {{ extraction_result.pdf_version }}
-            </div>
-        </div>
-        
-        {% else %}
-        <p style="color: #666; font-style: italic;">No accessibility analysis available.</p>
-        {% endif %}
+    <div id="sidebar" class="sidebar">
+        {% include "server/tools/_tool_wrapper.html" with tool_id="tool1" tool_title="Tool 1" tool_content_template="server/tools/tool_1.html" %}
     </div>
     
     <div class="right-viewer">
@@ -166,6 +126,42 @@
 </div>
 
 <script>
+    // Sidebar toggle functionality
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebar = document.getElementById('sidebar');
+    
+    if (sidebarToggle && sidebar) {
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            sidebarToggle.setAttribute('aria-expanded', !isCollapsed);
+        });
+    }
+    
+    // Foldout expand/collapse functionality
+    document.querySelectorAll('.tool-header').forEach(header => {
+        header.addEventListener('click', () => {
+            const foldout = header.closest('.tool-foldout');
+            const content = foldout.querySelector('.tool-content');
+            const chevron = header.querySelector('.tool-chevron');
+            const isExpanded = header.getAttribute('aria-expanded') === 'true';
+            
+            // Toggle expanded state
+            header.setAttribute('aria-expanded', !isExpanded);
+            content.classList.toggle('expanded');
+            chevron.classList.toggle('rotated');
+        });
+        
+        // Support keyboard interaction
+        header.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                header.click();
+            }
+        });
+    });
+    
+    // PDF rendering
     const url = '{{ pdf_data_url }}';
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     
