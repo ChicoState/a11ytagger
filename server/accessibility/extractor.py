@@ -162,14 +162,18 @@ def get_image_by_id(pdf_path, image_id):
 
 
 def tag_image_with_alt_text(pdf_path, image_id, alt_text):
+    import traceback
+    
     try:
-        pdf = pikepdf.Pdf.open(pdf_path)
+        print(f"[DEBUG] Opening PDF: {pdf_path}")
+        pdf = pikepdf.Pdf.open(pdf_path, allow_overwriting_input=True)
         
         current_id = 0
         target_image_obj = None
         target_page = None
         target_obj_name = None
         
+        print(f"[DEBUG] Searching for image with ID: {image_id}")
         for page_num, page in enumerate(pdf.pages, start=1):
             for obj_name, obj in page.images.items():
                 try:
@@ -178,19 +182,24 @@ def tag_image_with_alt_text(pdf_path, image_id, alt_text):
                             target_image_obj = obj
                             target_page = page
                             target_obj_name = obj_name
+                            print(f"[DEBUG] Found target image on page {page_num}, object: {obj_name}")
                             break
                         current_id += 1
-                except Exception:
+                except Exception as e:
+                    print(f"[DEBUG] Error checking image on page {page_num}: {e}")
                     continue
             if target_image_obj:
                 break
         
         if not target_image_obj:
+            print(f"[ERROR] Image with ID {image_id} not found (total images found: {current_id})")
             pdf.close()
             return False
         
+        print(f"[DEBUG] Getting/creating structure tree root")
         struct_tree_root = pdf.Root.get('/StructTreeRoot')
         if not struct_tree_root:
+            print(f"[DEBUG] Creating new structure tree root")
             struct_tree_root = pdf.make_indirect(pikepdf.Dictionary(
                 Type=pikepdf.Name('/StructTreeRoot'),
                 K=pikepdf.Array([])
@@ -198,8 +207,10 @@ def tag_image_with_alt_text(pdf_path, image_id, alt_text):
             pdf.Root.StructTreeRoot = struct_tree_root
         
         if '/K' not in struct_tree_root:
+            print(f"[DEBUG] Adding /K array to structure tree root")
             struct_tree_root.K = pikepdf.Array([])
         
+        print(f"[DEBUG] Creating figure element with alt text: {alt_text}")
         figure_elem = pdf.make_indirect(pikepdf.Dictionary(
             Type=pikepdf.Name('/StructElem'),
             S=pikepdf.Name('/Figure'),
@@ -207,23 +218,31 @@ def tag_image_with_alt_text(pdf_path, image_id, alt_text):
             Alt=alt_text
         ))
         
+        print(f"[DEBUG] Adding figure element to structure tree")
         if isinstance(struct_tree_root.K, list):
             struct_tree_root.K.append(figure_elem)
         else:
             struct_tree_root.K = pikepdf.Array([struct_tree_root.K, figure_elem])
         
+        print(f"[DEBUG] Setting MarkInfo")
         mark_info = pdf.Root.get('/MarkInfo')
         if not mark_info:
             pdf.Root.MarkInfo = pikepdf.Dictionary(Marked=True)
         else:
             mark_info.Marked = True
         
+        print(f"[DEBUG] Saving PDF to: {pdf_path}")
         pdf.save(pdf_path)
         pdf.close()
         
+        print(f"[DEBUG] Successfully tagged image {image_id}")
         return True
         
-    except Exception:
+    except Exception as e:
+        error_msg = f"{type(e).__name__}: {str(e)}"
+        traceback_str = traceback.format_exc()
+        print(f"[ERROR] Exception in tag_image_with_alt_text: {error_msg}")
+        print(f"[ERROR] Traceback:\n{traceback_str}")
         return False
 
 

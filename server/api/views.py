@@ -60,6 +60,8 @@ class ImageDetailView(View):
         return response
     
     def post(self, request, pdf_id, image_id):
+        import traceback
+        
         temp_path = cache.get(f"pdf_temp_path_{pdf_id}")
         if not temp_path:
             return JsonResponse({"error": "PDF not found"}, status=404)
@@ -71,15 +73,25 @@ class ImageDetailView(View):
             if not alt_text:
                 return JsonResponse({"error": "alt_text is required"}, status=400)
             
+            print(f"[DEBUG] Attempting to tag image {image_id} in {temp_path} with alt text: {alt_text}")
+            
             success = tag_image_with_alt_text(temp_path, image_id, alt_text)
             
             if success:
+                print(f"[DEBUG] Successfully tagged image {image_id}")
                 return JsonResponse({"success": True, "message": "Image tagged successfully"})
             else:
-                return JsonResponse({"error": "Failed to tag image"}, status=500)
+                print(f"[DEBUG] Failed to tag image {image_id}")
+                return JsonResponse({"error": "Failed to tag image - function returned False"}, status=500)
                 
-        except json.JSONDecodeError:
-            return JsonResponse({"error": "Invalid JSON"}, status=400)
+        except json.JSONDecodeError as e:
+            error_msg = f"Invalid JSON: {str(e)}"
+            print(f"[ERROR] {error_msg}")
+            return JsonResponse({"error": error_msg}, status=400)
         except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
+            error_msg = f"{type(e).__name__}: {str(e)}"
+            traceback_str = traceback.format_exc()
+            print(f"[ERROR] Exception in POST handler: {error_msg}")
+            print(f"[ERROR] Traceback:\n{traceback_str}")
+            return JsonResponse({"error": error_msg, "traceback": traceback_str}, status=500)
         
