@@ -18,7 +18,7 @@ install:
 
 # Run Django development server
 run:
-	uv run manage.py runserver 8080
+	uv run manage.py runserver 3000
 
 # Run Django migrations
 migrate:
@@ -44,7 +44,7 @@ docker-build: install collectstatic
 
 # Run Docker container
 docker-run: docker-build
-	docker run --rm -it -p 8080:8080 a11ytagger
+	docker run --rm -it -p 3000:3000 a11ytagger
 
 # Clean up cache files
 clean:
