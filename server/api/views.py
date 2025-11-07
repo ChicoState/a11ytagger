@@ -1,9 +1,10 @@
+import json
 from dataclasses import asdict
 from django.views import View
 from django.http import JsonResponse, HttpResponse
 from django.core.cache import cache
 
-from server.accessibility.extractor import extract_accessibility_info, extract_all_images, get_image_by_id
+from server.accessibility.extractor import extract_accessibility_info, extract_all_images, get_image_by_id, tag_image_with_alt_text
 
 
 class MetadataView(View):
@@ -16,6 +17,9 @@ class MetadataView(View):
         
         result = extract_accessibility_info(temp_path, pdf_filename)
         result_dict = asdict(result)
+        
+        images = extract_all_images(temp_path)
+        result_dict['actual_image_count'] = len(images)
         
         return JsonResponse(result_dict, safe=False, json_dumps_params={'default': str})
 
@@ -54,4 +58,28 @@ class ImageDetailView(View):
         
         response = HttpResponse(image['data'], content_type='image/png')
         return response
+    
+    def post(self, request, pdf_id, image_id):
+        temp_path = cache.get(f"pdf_temp_path_{pdf_id}")
+        if not temp_path:
+            return JsonResponse({"error": "PDF not found"}, status=404)
+        
+        try:
+            data = json.loads(request.body)
+            alt_text = data.get('alt_text')
+            
+            if not alt_text:
+                return JsonResponse({"error": "alt_text is required"}, status=400)
+            
+            success = tag_image_with_alt_text(temp_path, image_id, alt_text)
+            
+            if success:
+                return JsonResponse({"success": True, "message": "Image tagged successfully"})
+            else:
+                return JsonResponse({"error": "Failed to tag image"}, status=500)
+                
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
         

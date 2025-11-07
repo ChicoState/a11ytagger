@@ -161,6 +161,72 @@ def get_image_by_id(pdf_path, image_id):
     return None
 
 
+def tag_image_with_alt_text(pdf_path, image_id, alt_text):
+    try:
+        pdf = pikepdf.Pdf.open(pdf_path)
+        
+        current_id = 0
+        target_image_obj = None
+        target_page = None
+        target_obj_name = None
+        
+        for page_num, page in enumerate(pdf.pages, start=1):
+            for obj_name, obj in page.images.items():
+                try:
+                    if obj.Subtype == '/Image':
+                        if current_id == image_id:
+                            target_image_obj = obj
+                            target_page = page
+                            target_obj_name = obj_name
+                            break
+                        current_id += 1
+                except Exception:
+                    continue
+            if target_image_obj:
+                break
+        
+        if not target_image_obj:
+            pdf.close()
+            return False
+        
+        struct_tree_root = pdf.Root.get('/StructTreeRoot')
+        if not struct_tree_root:
+            struct_tree_root = pdf.make_indirect(pikepdf.Dictionary(
+                Type=pikepdf.Name('/StructTreeRoot'),
+                K=pikepdf.Array([])
+            ))
+            pdf.Root.StructTreeRoot = struct_tree_root
+        
+        if '/K' not in struct_tree_root:
+            struct_tree_root.K = pikepdf.Array([])
+        
+        figure_elem = pdf.make_indirect(pikepdf.Dictionary(
+            Type=pikepdf.Name('/StructElem'),
+            S=pikepdf.Name('/Figure'),
+            P=struct_tree_root,
+            Alt=alt_text
+        ))
+        
+        if isinstance(struct_tree_root.K, list):
+            struct_tree_root.K.append(figure_elem)
+        else:
+            struct_tree_root.K = pikepdf.Array([struct_tree_root.K, figure_elem])
+        
+        mark_info = pdf.Root.get('/MarkInfo')
+        if not mark_info:
+            pdf.Root.MarkInfo = pikepdf.Dictionary(Marked=True)
+        else:
+            mark_info.Marked = True
+        
+        pdf.save(pdf_path)
+        pdf.close()
+        
+        return True
+        
+    except Exception:
+        return False
+
+
 def extract_accessibility_info(pdf_path, filename):
     result = ExtractionResult(
         pdf_filename=filename,
