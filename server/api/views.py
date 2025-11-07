@@ -1,7 +1,8 @@
+import os
 import json
 from dataclasses import asdict
 from django.views import View
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, FileResponse
 from django.core.cache import cache
 
 from server.accessibility.extractor import extract_accessibility_info, extract_all_images, get_image_by_id, tag_image_with_alt_text
@@ -94,4 +95,37 @@ class ImageDetailView(View):
             print(f"[ERROR] Exception in POST handler: {error_msg}")
             print(f"[ERROR] Traceback:\n{traceback_str}")
             return JsonResponse({"error": error_msg, "traceback": traceback_str}, status=500)
+
+
+class DownloadView(View):
+    def get(self, request, pdf_id):
+        temp_path = cache.get(f"pdf_temp_path_{pdf_id}")
+        if not temp_path:
+            return JsonResponse({"error": "PDF not found"}, status=404)
+        
+        if not os.path.exists(temp_path):
+            return JsonResponse({"error": "PDF file not found on disk"}, status=404)
+        
+        original_filename = temp_path.split("/")[-1].rsplit("_", 1)[0] + ".pdf"
+        
+        response = FileResponse(open(temp_path, 'rb'), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{original_filename}"'
+        
+        return response
+
+
+class CleanupView(View):
+    def post(self, request, pdf_id):
+        temp_path = cache.get(f"pdf_temp_path_{pdf_id}")
+        
+        if temp_path and os.path.exists(temp_path):
+            try:
+                os.remove(temp_path)
+                print(f"[DEBUG] Deleted temporary file: {temp_path}")
+            except Exception as e:
+                print(f"[ERROR] Failed to delete temp file: {e}")
+        
+        cache.delete(f"pdf_temp_path_{pdf_id}")
+        
+        return JsonResponse({"success": True, "message": "Cleanup complete"})
         
