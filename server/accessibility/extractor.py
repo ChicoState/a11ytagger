@@ -1,4 +1,5 @@
 import os
+import io
 from datetime import datetime, timedelta
 
 import pikepdf
@@ -108,6 +109,56 @@ def get_metadata(pdf):
     metadata['title'] = str(title) if title else None
 
     return metadata
+
+
+def extract_all_images(pdf_path):
+    images = []
+    
+    try:
+        pdf = pikepdf.Pdf.open(pdf_path)
+        
+        image_id = 0
+        for page_num, page in enumerate(pdf.pages, start=1):
+            for obj_name, obj in page.images.items():
+                try:
+                    raw_image = obj
+                    
+                    if raw_image.Subtype == '/Image':
+                        pil_image = pikepdf.PdfImage(raw_image).as_pil_image()
+                        
+                        img_buffer = io.BytesIO()
+                        pil_image.save(img_buffer, format='PNG')
+                        img_data = img_buffer.getvalue()
+                        
+                        images.append({
+                            'id': image_id,
+                            'page_number': page_num,
+                            'width': pil_image.width,
+                            'height': pil_image.height,
+                            'format': pil_image.format or 'PNG',
+                            'data': img_data
+                        })
+                        image_id += 1
+                        
+                except Exception as e:
+                    continue
+        
+        pdf.close()
+        
+    except Exception as e:
+        pass
+    
+    return images
+
+
+def get_image_by_id(pdf_path, image_id):
+    images = extract_all_images(pdf_path)
+    
+    for img in images:
+        if img['id'] == image_id:
+            return img
+    
+    return None
 
 
 def extract_accessibility_info(pdf_path, filename):

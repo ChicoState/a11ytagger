@@ -1,0 +1,160 @@
+<div id="metadata-container" style="padding: 1rem;">
+    <p style="color: #666; font-style: italic;">Loading metadata...</p>
+</div>
+
+<style>
+    .metadata-section {
+        margin-bottom: 1.5rem;
+    }
+    .metadata-section h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+    .metadata-grid {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+    }
+    .metadata-label {
+        font-weight: 500;
+        color: #666;
+    }
+    .metadata-value {
+        color: #333;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 0.125rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    .status-success {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+    .status-error {
+        background: #ffebee;
+        color: #c62828;
+    }
+    .status-warning {
+        background: #fff3e0;
+        color: #ef6c00;
+    }
+    .message-list {
+        margin: 0;
+        padding-left: 1.25rem;
+        font-size: 0.875rem;
+    }
+</style>
+
+<script>
+    (function() {
+        const pdfId = '{{ pdf_id }}';
+        const container = document.getElementById('metadata-container');
+        
+        function formatMetadata(data) {
+            let html = '';
+            
+            // Document Info
+            html += '<div class="metadata-section">';
+            html += '<h3>Document Information</h3>';
+            html += '<div class="metadata-grid">';
+            html += `<span class="metadata-label">Filename:</span><span class="metadata-value">${data.pdf_filename || 'N/A'}</span>`;
+            html += `<span class="metadata-label">Pages:</span><span class="metadata-value">${data.page_count || 0}</span>`;
+            html += `<span class="metadata-label">PDF Version:</span><span class="metadata-value">${data.pdf_version || 'N/A'}</span>`;
+            html += `<span class="metadata-label">File Size:</span><span class="metadata-value">${formatBytes(data.file_size_bytes)}</span>`;
+            if (data.document_title) {
+                html += `<span class="metadata-label">Title:</span><span class="metadata-value">${data.document_title}</span>`;
+            }
+            if (data.document_language) {
+                html += `<span class="metadata-label">Language:</span><span class="metadata-value">${data.document_language}</span>`;
+            }
+            html += '</div></div>';
+            
+            // Accessibility Status
+            html += '<div class="metadata-section">';
+            html += '<h3>Accessibility Status</h3>';
+            html += '<div class="metadata-grid">';
+            html += `<span class="metadata-label">Tagged PDF:</span><span class="metadata-value"><span class="status-badge ${data.is_tagged ? 'status-success' : 'status-error'}">${data.is_tagged ? 'Yes' : 'No'}</span></span>`;
+            html += `<span class="metadata-label">Structure Tree:</span><span class="metadata-value"><span class="status-badge ${data.has_structure_tree ? 'status-success' : 'status-error'}">${data.has_structure_tree ? 'Present' : 'Missing'}</span></span>`;
+            html += `<span class="metadata-label">Encrypted:</span><span class="metadata-value"><span class="status-badge ${data.is_encrypted ? 'status-warning' : 'status-success'}">${data.is_encrypted ? 'Yes' : 'No'}</span></span>`;
+            html += '</div></div>';
+            
+            // Images
+            if (data.total_images > 0 || data.actual_image_count > 0) {
+                html += '<div class="metadata-section">';
+                html += '<h3>Images</h3>';
+                html += '<div class="metadata-grid">';
+                if (data.actual_image_count !== undefined) {
+                    html += `<span class="metadata-label">Total Images in PDF:</span><span class="metadata-value">${data.actual_image_count}</span>`;
+                }
+                if (data.total_images > 0) {
+                    html += `<span class="metadata-label">Tagged in Structure:</span><span class="metadata-value">${data.total_images}</span>`;
+                    html += `<span class="metadata-label">With Alt Text:</span><span class="metadata-value">${data.images_with_alt_text}</span>`;
+                    html += `<span class="metadata-label">Without Alt Text:</span><span class="metadata-value">${data.images_without_alt_text}</span>`;
+                } else if (data.actual_image_count > 0) {
+                    html += `<span class="metadata-label">Tagged in Structure:</span><span class="metadata-value">0 (none tagged)</span>`;
+                }
+                html += '</div></div>';
+            }
+            
+            // Structure Types
+            if (data.structure_types_found && data.structure_types_found.length > 0) {
+                html += '<div class="metadata-section">';
+                html += '<h3>Structure Elements Found</h3>';
+                html += `<div class="metadata-value">${data.structure_types_found.join(', ')}</div>`;
+                html += '</div>';
+            }
+            
+            // Errors
+            if (data.errors && data.errors.length > 0) {
+                html += '<div class="metadata-section">';
+                html += '<h3>Errors</h3>';
+                html += '<ul class="message-list">';
+                data.errors.forEach(error => {
+                    html += `<li style="color: #c62828;">${error}</li>`;
+                });
+                html += '</ul></div>';
+            }
+            
+            // Warnings
+            if (data.warnings && data.warnings.length > 0) {
+                html += '<div class="metadata-section">';
+                html += '<h3>Warnings</h3>';
+                html += '<ul class="message-list">';
+                data.warnings.forEach(warning => {
+                    html += `<li style="color: #ef6c00;">${warning}</li>`;
+                });
+                html += '</ul></div>';
+            }
+            
+            return html;
+        }
+        
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+        
+        fetch(`/api/${pdfId}/accessibility_metadata/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch metadata');
+                }
+                return response.json();
+            })
+            .then(data => {
+                container.innerHTML = formatMetadata(data);
+            })
+            .catch(error => {
+                container.innerHTML = '<p style="color: #d32f2f;">Error loading metadata: ' + error.message + '</p>';
+            });
+    })();
+</script>

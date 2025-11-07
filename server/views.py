@@ -5,7 +5,6 @@ from django.views import View
 from django.core.cache import cache
 
 from server.accessibility.validators import validate_pdf_file
-from server.accessibility.extractor import extract_accessibility_info
 
 
 def hello_world(request):
@@ -24,12 +23,11 @@ class PDFUploadView(View):
         pdf_data = pdf_file.read()
         pdf_id = base64.urlsafe_b64encode(pdf_file.name.encode()).decode()[:16]
 
-        cache.set(f"pdf_{pdf_id}", pdf_data, timeout=3600)
-        cache.set(f"pdf_filename_{pdf_id}", pdf_file.name, timeout=3600)
-
         temp_path = f"/tmp/{pdf_file.name}_{pdf_id}"
         with open(temp_path, "wb") as f:
             f.write(pdf_data)
+        
+        cache.set(f"pdf_temp_path_{pdf_id}", temp_path, timeout=3600)
 
         validation = validate_pdf_file(temp_path)
         if not validation.can_proceed:
@@ -39,29 +37,24 @@ class PDFUploadView(View):
                 "warnings": validation.warnings
             })
 
-        result = extract_accessibility_info(temp_path, pdf_file.name)
-        os.remove(temp_path)
-
-        cache.set(f"pdf_extraction_{pdf_id}", result, timeout=3600)
-
         return redirect("pdf_viewer", pdf_id=pdf_id)
 
 
 class PDFViewerView(View):
     def get(self, request, pdf_id):
-        pdf_data = cache.get(f"pdf_{pdf_id}")
-        if not pdf_data:
+        temp_path = cache.get(f"pdf_temp_path_{pdf_id}")
+        if not temp_path or not os.path.exists(temp_path):
             return redirect("pdf_upload")
 
+        with open(temp_path, "rb") as f:
+            pdf_data = f.read()
+        
         pdf_base64 = base64.b64encode(pdf_data).decode()
         pdf_data_url = f"data:application/pdf;base64,{pdf_base64}"
 
-        extraction_result = cache.get(f"pdf_extraction_{pdf_id}")
-
         return render(request, "server/viewer.html", {
             "pdf_data_url": pdf_data_url,
-            "pdf_id": pdf_id,
-            "extraction_result": extraction_result
+            "pdf_id": pdf_id
         })
 
 
