@@ -1,11 +1,59 @@
+import base64
 import os
 import json
 from dataclasses import asdict
 from django.views import View
 from django.http import JsonResponse, HttpResponse, FileResponse
 from django.core.cache import cache
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 from server.accessibility.extractor import extract_accessibility_info, extract_all_images, get_image_by_id, tag_image_with_alt_text
+from server.accessibility.validators import validate_pdf_file
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class PDFUploadView(View):
+    def post(self, request):
+        pdf_file = request.FILES.get("pdf_file")
+        if not pdf_file:
+            return JsonResponse({"error": "No file uploaded"}, status=400)
+
+        pdf_data = pdf_file.read()
+        pdf_id = base64.urlsafe_b64encode(pdf_file.name.encode()).decode()[:16]
+
+        temp_path = f"/tmp/{pdf_file.name}_{pdf_id}"
+        with open(temp_path, "wb") as f:
+            f.write(pdf_data)
+        
+        cache.set(f"pdf_temp_path_{pdf_id}", temp_path, timeout=3600)
+
+        validation = validate_pdf_file(temp_path)
+        if not validation.can_proceed:
+            os.remove(temp_path)
+            return JsonResponse({
+                "error": validation.errors[0] if validation.errors else "Invalid PDF",
+                "warnings": validation.warnings
+            }, status=400)
+
+        return JsonResponse({"pdf_id": pdf_id, "success": True}, status=201)
+
+
+class PDFDataView(View):
+    def get(self, request, pdf_id):
+        temp_path = cache.get(f"pdf_temp_path_{pdf_id}")
+        if not temp_path or not os.path.exists(temp_path):
+            return JsonResponse({"error": "PDF not found"}, status=404)
+
+        with open(temp_path, "rb") as f:
+            pdf_data = f.read()
+        
+        pdf_base64 = base64.b64encode(pdf_data).decode()
+        
+        return JsonResponse({
+            "pdf_data_url": f"data:application/pdf;base64,{pdf_base64}",
+            "pdf_id": pdf_id
+        })
 
 
 class MetadataView(View):

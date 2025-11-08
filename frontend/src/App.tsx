@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { Navbar } from 'src/components/Navbar'
 import { Home } from 'src/components/Home'
 import { Upload } from 'src/components/Upload'
+import { Viewer } from 'src/components/Viewer'
 
 function AppContent() {
   const location = useLocation()
@@ -12,6 +13,7 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/upload/" element={<Upload />} />
+        <Route path="/viewer/:pdfId/" element={<Viewer />} />
         <Route path="/faq/" element={<div className="p-8"><h1 className="text-4xl font-bold">FAQ</h1></div>} />
         <Route path="/about/" element={<div className="p-8"><h1 className="text-4xl font-bold">About</h1></div>} />
       </Routes>

@@ -28,6 +28,12 @@ DEBUG = os.environ.get('DEBUG', True)
 
 ALLOWED_HOSTS = []
 
+# CSRF settings for development
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8080',
+    'http://127.0.0.1:8080',
+]
+
 
 # Application definition
 
