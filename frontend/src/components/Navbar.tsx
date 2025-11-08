@@ -29,26 +29,8 @@ export function Navbar({ onSidebarToggle, currentPath = '/' }: NavbarProps) {
   ]
 
   return (
-    <nav className="bg-[var(--navbar-color)] px-5 py-2.5 flex justify-between items-center">
+    <nav className="sticky top-0 z-50 bg-[var(--navbar-color)] px-5 py-2.5 flex justify-between items-center">
       <div className="flex items-center gap-5 pl-0">
-        <button
-          type="button"
-          id="sidebar-toggle"
-          className="sidebar-toggle-btn"
-          title="Toggle Sidebar"
-          aria-label="Toggle Sidebar"
-          aria-expanded={sidebarExpanded}
-          aria-controls="sidebar"
-          onClick={handleSidebarToggle}
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <rect x="3" y="3" width="7" height="18" stroke="currentColor" strokeWidth="2" fill="none"/>
-            <line x1="14" y1="6" x2="21" y2="6" stroke="currentColor" strokeWidth="2"/>
-            <line x1="14" y1="12" x2="21" y2="12" stroke="currentColor" strokeWidth="2"/>
-            <line x1="14" y1="18" x2="21" y2="18" stroke="currentColor" strokeWidth="2"/>
-          </svg>
-        </button>
-        
         <NavigationMenu viewport={false}>
           <NavigationMenuList className="gap-5">
             {navLinks.map((link) => (

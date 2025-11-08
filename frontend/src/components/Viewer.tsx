@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarTrigger } from 'src/components/ui/sidebar'
+import { MetadataTool, ImageTaggerTool, DownloadTool } from 'src/components/tools'
 
 interface PDFDataResponse {
   pdf_data_url: string
@@ -138,25 +140,69 @@ export function Viewer() {
   }
 
   return (
-    <div className="viewer-wrapper">
-      <div className="viewer-container">
-        {loading && (
-          <div className="loading-message">
-            <p>Loading PDF...</p>
+    <SidebarProvider defaultOpen={true}>
+      <div className="viewer-wrapper">
+        <Sidebar>
+          <SidebarHeader className="border-b p-4">
+            <h2 className="text-lg font-semibold">Tools</h2>
+          </SidebarHeader>
+          <SidebarContent className="p-4">
+            {pdfId && (
+              <>
+                <MetadataTool pdfId={pdfId} />
+                <ImageTaggerTool pdfId={pdfId} />
+                <DownloadTool pdfId={pdfId} />
+              </>
+            )}
+          </SidebarContent>
+        </Sidebar>
+
+        <main className="viewer-main">
+          <div className="viewer-header">
+            <SidebarTrigger />
           </div>
-        )}
-        <div ref={containerRef} className="pdf-pages"></div>
+          <div className="viewer-container">
+            {loading && (
+              <div className="loading-message">
+                <p>Loading PDF...</p>
+              </div>
+            )}
+            <div ref={containerRef} className="pdf-pages"></div>
+          </div>
+        </main>
       </div>
 
       <style>{`
         .viewer-wrapper {
-          height: 100vh;
+          display: flex;
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          padding-top: 60px;
           overflow: hidden;
           background: #f5f5f5;
+          z-index: 10;
+        }
+
+        .viewer-main {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          overflow: hidden;
+        }
+
+        .viewer-header {
+          padding: 1rem;
+          background: white;
+          border-bottom: 1px solid #e5e7eb;
+          z-index: 20;
         }
 
         .viewer-container {
-          height: 100vh;
+          flex: 1;
           overflow-y: auto;
           background: #f5f5f5;
           padding: 20px;
@@ -226,6 +272,6 @@ export function Viewer() {
           outline-offset: 2px;
         }
       `}</style>
-    </div>
+    </SidebarProvider>
   )
 }

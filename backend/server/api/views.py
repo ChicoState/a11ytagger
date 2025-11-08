@@ -94,6 +94,7 @@ class ImageListView(View):
         return JsonResponse({'images': image_list})
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class ImageDetailView(View):
     def get(self, request, pdf_id, image_id):
         temp_path = cache.get(f"pdf_temp_path_{pdf_id}")
@@ -162,6 +163,7 @@ class DownloadView(View):
         return response
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class CleanupView(View):
     def post(self, request, pdf_id):
         temp_path = cache.get(f"pdf_temp_path_{pdf_id}")
