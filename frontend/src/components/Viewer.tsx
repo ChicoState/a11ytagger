@@ -183,7 +183,6 @@ export function Viewer() {
           padding-top: 60px;
           overflow: hidden;
           background: #f5f5f5;
-          z-index: 10;
         }
 
         .viewer-main {
@@ -198,7 +197,7 @@ export function Viewer() {
           padding: 1rem;
           background: white;
           border-bottom: 1px solid #e5e7eb;
-          z-index: 20;
+          // z-index: 20;
         }
 
         .viewer-container {

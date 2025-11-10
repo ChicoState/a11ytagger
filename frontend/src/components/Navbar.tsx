@@ -6,6 +6,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from 'src/components/ui/navigation-menu'
+import { SidebarTrigger } from './ui/sidebar'
 
 interface NavbarProps {
   onSidebarToggle?: () => void
@@ -61,35 +62,6 @@ export function Navbar({ onSidebarToggle, currentPath = '/' }: NavbarProps) {
       </button>
 
       <style>{`
-        .sidebar-toggle-btn {
-          background-color: black;
-          color: white;
-          border: none;
-          padding: 10px;
-          border-radius: 4px;
-          cursor: pointer;
-          transition: background-color 0.3s;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 44px;
-          height: 44px;
-        }
-
-        .sidebar-toggle-btn:hover {
-          background-color: #333;
-        }
-
-        .sidebar-toggle-btn:focus {
-          outline: 2px solid #fff;
-          outline-offset: 2px;
-        }
-
-        .sidebar-toggle-btn svg {
-          width: 24px;
-          height: 24px;
-        }
-
         .nav-link {
           background-color: var(--btn-color) !important;
           color: var(--text-color) !important;

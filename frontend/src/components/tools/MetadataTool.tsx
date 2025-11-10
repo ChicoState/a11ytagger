@@ -64,7 +64,6 @@ export function MetadataTool({ pdfId }: MetadataToolProps) {
       
       {metadata && (
         <div className="space-y-6">
-          {/* Document Information */}
           <div className="metadata-section">
             <h3 className="text-base font-semibold mb-2 text-gray-800">Document Information</h3>
             <div className="metadata-grid">
@@ -96,7 +95,6 @@ export function MetadataTool({ pdfId }: MetadataToolProps) {
             </div>
           </div>
 
-          {/* Accessibility Status */}
           <div className="metadata-section">
             <h3 className="text-base font-semibold mb-2 text-gray-800">Accessibility Status</h3>
             <div className="metadata-grid">
@@ -123,7 +121,6 @@ export function MetadataTool({ pdfId }: MetadataToolProps) {
             </div>
           </div>
 
-          {/* Images */}
           {(metadata.total_images > 0 || (metadata.actual_image_count && metadata.actual_image_count > 0)) && (
             <div className="metadata-section">
               <h3 className="text-base font-semibold mb-2 text-gray-800">Images</h3>
@@ -156,7 +153,6 @@ export function MetadataTool({ pdfId }: MetadataToolProps) {
             </div>
           )}
 
-          {/* Structure Types */}
           {metadata.structure_types_found && metadata.structure_types_found.length > 0 && (
             <div className="metadata-section">
               <h3 className="text-base font-semibold mb-2 text-gray-800">Structure Elements Found</h3>
@@ -164,7 +160,6 @@ export function MetadataTool({ pdfId }: MetadataToolProps) {
             </div>
           )}
 
-          {/* Errors */}
           {metadata.errors && metadata.errors.length > 0 && (
             <div className="metadata-section">
               <h3 className="text-base font-semibold mb-2 text-gray-800">Errors</h3>
@@ -176,7 +171,6 @@ export function MetadataTool({ pdfId }: MetadataToolProps) {
             </div>
           )}
 
-          {/* Warnings */}
           {metadata.warnings && metadata.warnings.length > 0 && (
             <div className="metadata-section">
               <h3 className="text-base font-semibold mb-2 text-gray-800">Warnings</h3>

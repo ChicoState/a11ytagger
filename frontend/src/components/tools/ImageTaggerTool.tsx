@@ -116,13 +116,7 @@ export function ImageTaggerTool({ pdfId }: ImageTaggerToolProps) {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!isModalOpen) return
     
-    if (e.key === 'ArrowLeft') {
-      e.preventDefault()
-      prevImage()
-    } else if (e.key === 'ArrowRight') {
-      e.preventDefault()
-      nextImage()
-    } else if (e.key === 'Escape') {
+    if (e.key === 'Escape') {
       closeModal()
     }
   }
@@ -222,7 +216,7 @@ export function ImageTaggerTool({ pdfId }: ImageTaggerToolProps) {
           width: 100%;
           height: 100%;
           background: rgba(0, 0, 0, 0.8);
-          z-index: 1000;
+          z-index: 9999;
           display: flex;
           justify-content: center;
           align-items: center;
