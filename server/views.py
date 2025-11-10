@@ -65,4 +65,12 @@ class PDFViewerView(View):
         })
 
 
+class AboutView(View):
+    def get(self, request):
+        return render(request, "server/about.html")
+
+
+class FAQView(View):
+    def get(self, request):
+        return render(request, "server/faq.html")
 
