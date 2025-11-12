@@ -1,54 +1,45 @@
-.PHONY: help install sync run migrate makemigrations shell build docker-build docker-run clean collectstatic
+.PHONY: help cluster-create cluster-delete cluster-restart up down logs clean
 
 # Default target - show help
 help:
 	@echo "Available targets:"
-	@echo "  install       - Sync dependencies with uv"
-	@echo "  run           - Run Django development server"
-	@echo "  migrate       - Run Django migrations"
-	@echo "  makemigrations - Create new migrations"
-	@echo "  shell         - Open Django shell"
-	@echo "  build         - Build Docker image"
-	@echo "  docker-run    - Run Docker container"
-	@echo "  clean         - Clean up cache files"
+	@echo "  cluster-create   - Create k3d cluster"
+	@echo "  cluster-delete   - Delete k3d cluster"
+	@echo "  cluster-restart  - Restart k3d cluster"
+	@echo "  up               - Start Tilt (deploys everything)"
+	@echo "  down             - Stop Tilt"
+	@echo "  logs             - Show Tilt logs"
+	@echo "  clean            - Delete cluster and clean up"
 
-# Install dependencies with uv
-install:
-	uv sync --frozen
+# Create k3d cluster
+cluster-create:
+	@echo "Creating k3d cluster..."
+	k3d cluster create a11ytagger \
+		--registry-create a11ytagger \
+		--wait
+	@echo "Cluster created successfully!"
 
-# Run Django development server
-run:
-	uv run manage.py runserver 8080
+# Delete k3d cluster
+cluster-delete:
+	@echo "Deleting k3d cluster..."
+	k3d cluster delete a11ytagger
+	@echo "Cluster deleted successfully!"
 
-# Run Django migrations
-migrate:
-	uv run manage.py migrate
+# Restart k3d cluster
+cluster-restart: cluster-delete cluster-create
 
-# Run Django collectstatic
-collectstatic:
-	uv run manage.py collectstatic --noinput
+# Start Tilt (deploys everything)
+up:
+	tilt up
 
-# Create new migrations
-makemigrations:
-	uv run manage.py makemigrations
+# Stop Tilt
+down:
+	tilt down
 
-# Open Django shell
-shell:
-	uv run manage.py shell
+# Show Tilt logs
+logs:
+	tilt logs
 
-# Build Docker image
-build: docker-build
-
-docker-build: install collectstatic
-	docker build -t a11ytagger .
-
-# Run Docker container
-docker-run: docker-build
-	docker run --rm -it -p 8080:8080 a11ytagger
-
-# Clean up cache files
-clean:
-	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-	find . -type f -name "*.pyc" -delete
-	find . -type f -name "*.pyo" -delete
-	find . -type f -name ".DS_Store" -delete 2>/dev/null || true
+# Clean up everything
+clean: down cluster-delete
+	@echo "Cleanup complete!"
