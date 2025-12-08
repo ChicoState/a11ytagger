@@ -85,8 +85,6 @@ def test_extract_accessibility_info_encrypted_and_password_error(monkeypatch, tm
 
         def __init__(self):
             self.pages = []
-            self.pdf_version = "1.7"
-            self.Root = SimpleNamespace(get=lambda k: None)
 
         def close(self):
             pass
@@ -98,7 +96,7 @@ def test_extract_accessibility_info_encrypted_and_password_error(monkeypatch, tm
 
     res = extractor.extract_accessibility_info(str(f), "enc.pdf")
     assert res.is_encrypted is True
-    assert any("encrypted" in e.lower() for e in res.errors)
+    assert any("PDF is encrypted" in e for e in res.errors)
 
     # PasswordError handling
     def raise_pw(path):
