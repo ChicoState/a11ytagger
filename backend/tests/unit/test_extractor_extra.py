@@ -82,6 +82,7 @@ def test_extract_accessibility_info_encrypted_and_password_error(monkeypatch, tm
     # Encrypted pdf early-return
     class EncryptedPdf:
         is_encrypted = True
+        pdf_version = "1.7"
 
         def __init__(self):
             self.pages = []
