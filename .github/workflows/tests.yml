@@ -15,7 +15,8 @@ jobs:
     env:
       PYTHONPATH: ${{ github.workspace }}/backend
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -26,9 +27,7 @@ jobs:
         uses: astral-sh/setup-uv@v3
 
       - name: Install deps
-        run: |
-          uv pip install --upgrade pip
-          uv pip install pytest pikepdf pillow lxml django
+        run: uv sync --dev
 
       - name: Run tests
         run: uv run python -m pytest
@@ -40,7 +39,8 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Set up Node
         uses: actions/setup-node@v4
