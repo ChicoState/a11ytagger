@@ -2,12 +2,11 @@ name: Tests
 
 on:
   pull_request:
-    branches: [main]
   push:
     branches: [main]
 
 jobs:
-    backend:
+  backend:
     name: Backend (pytest)
     runs-on: ubuntu-latest
     defaults:
@@ -16,8 +15,7 @@ jobs:
     env:
       PYTHONPATH: ${{ github.workspace }}/backend
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -29,12 +27,11 @@ jobs:
 
       - name: Install deps
         run: |
-          uv pip install -U pip
+          uv pip install --upgrade pip
           uv pip install pytest pikepdf pillow lxml django
 
       - name: Run tests
         run: uv run python -m pytest
-
 
   frontend:
     name: Frontend (vitest)
@@ -43,13 +40,15 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+
+      - name: Enable corepack (yarn)
+        run: corepack enable
 
       - name: Install deps
         run: yarn install --frozen-lockfile
