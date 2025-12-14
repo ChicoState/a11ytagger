@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  backend:
+    backend:
     name: Backend (pytest)
     runs-on: ubuntu-latest
     defaults:
@@ -28,10 +28,13 @@ jobs:
         uses: astral-sh/setup-uv@v3
 
       - name: Install deps
-        run: uv sync --dev
+        run: |
+          uv pip install -U pip
+          uv pip install pytest pikepdf pillow lxml django
 
       - name: Run tests
-        run: uv run pytest
+        run: uv run python -m pytest
+
 
   frontend:
     name: Frontend (vitest)
