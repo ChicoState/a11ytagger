@@ -82,6 +82,7 @@ def test_extract_accessibility_info_encrypted_and_password_error(monkeypatch, tm
     # Encrypted pdf early-return
     class EncryptedPdf:
         is_encrypted = True
+        pdf_version = "1.7"
 
         def __init__(self):
             self.pages = []
@@ -106,3 +107,23 @@ def test_extract_accessibility_info_encrypted_and_password_error(monkeypatch, tm
     res2 = extractor.extract_accessibility_info(str(f), "enc.pdf")
     assert res2.is_encrypted is True
     assert any("password" in e.lower() for e in res2.errors)
+
+
+def test_extract_accessibility_info_corrupt_pdf(monkeypatch, tmp_path):
+    # Simulate pikepdf failing to open a corrupt PDF
+    def raise_corrupt(path):
+        raise Exception("corrupt pdf")
+
+    monkeypatch.setattr(extractor.pikepdf.Pdf, "open", raise_corrupt, raising=False)
+    monkeypatch.setattr(extractor.os.path, "getsize", lambda p: 1024)
+
+    f = tmp_path / "corrupt.pdf"
+    f.write_bytes(b"x")
+
+    res = extractor.extract_accessibility_info(str(f), "corrupt.pdf")
+
+    # ExtractionResult doesn't have can_proceed; validate via errors
+    assert res.is_encrypted is False
+    assert res.errors
+    assert any("unexpected" in e.lower() or "error" in e.lower() or "corrupt" in e.lower() for e in res.errors)
+

@@ -44,3 +44,13 @@ def test_validate_pdf_file_very_large_warns(monkeypatch, tmp_path):
     assert any("Very large file" in w for w in res.warnings)
     assert any("Large file" in w for w in res.warnings)
     assert res.status == validators.ValidationStatus.WARNING.value
+
+def test_validate_pdf_file_rejects_non_pdf_extension(tmp_path):
+    f = tmp_path / "not_a_pdf.txt"
+    f.write_bytes(b"hello")
+
+    res = validators.validate_pdf_file(str(f))
+
+    assert res.can_proceed is False
+    assert res.status == validators.ValidationStatus.INVALID.value
+    assert any("pdf" in e.lower() for e in res.errors)
