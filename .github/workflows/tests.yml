@@ -1,0 +1,60 @@
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  backend:
+    name: Backend (pytest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      PYTHONPATH: ${{ github.workspace }}/backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Install deps
+        run: uv sync --dev
+
+      - name: Install pytest
+        run: uv pip install pytest
+
+      - name: Run tests
+        run: uv run python -m pytest
+
+  frontend:
+    name: Frontend (vitest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Enable corepack (yarn)
+        run: corepack enable
+
+      - name: Install deps
+        run: yarn install --frozen-lockfile
+
+      - name: Run tests
+        run: yarn test --run
